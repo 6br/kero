@@ -16,6 +16,7 @@
 #include <termios.h>
 #include <time.h>
 #include <unistd.h>
+
 /*** defines ***/
 #define KERO_VERSION "0.0.1"
 #define KERO_TAB_STOP 4
@@ -118,6 +119,13 @@ char *BASH_HL_keywords[] = {
   NULL
 };
 
+char *PYTHON_HL_extensions[] = { ".py", NULL };
+char *PYTHON_HL_keywords[] = {
+  "and", "as", "assert", "break", "class", "continue", "def", "del", "elif", "else", "except", "exec",
+  "finally", "for", "global", "if", "in", "is", "lambda", "not", "or", "pass", "raise", "return",
+  "try" "while" "with","yield", NULL
+};
+
 struct editorSyntax HLDB[] = {
   {
     "c",
@@ -130,7 +138,14 @@ struct editorSyntax HLDB[] = {
     "bash",
     BASH_HL_extensions,
     BASH_HL_keywords,
-    "#", "/*", "*/",
+    "#", "<<", "<<",
+    HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
+  },
+  {
+    "python",
+    PYTHON_HL_extensions,
+    PYTHON_HL_keywords,
+    "#", "\"\"\"", "\"\"\"",
     HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
   }
 };																	
@@ -169,7 +184,7 @@ void enableRawMode() {
   raw.c_cflag |= (CS8);
   raw.c_lflag &= ~(ECHO | ICANON | ISIG | IEXTEN);
   raw.c_cc[VMIN] = 0;
-  raw.c_cc[VTIME] = 1;
+  raw.c_cc[VTIME] = 0;
 
   if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) die("tcsetattr");
 }
