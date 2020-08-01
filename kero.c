@@ -16,7 +16,6 @@
 #include <termios.h>
 #include <time.h>
 #include <unistd.h>
-
 /*** defines ***/
 #define KERO_VERSION "0.0.1"
 #define KERO_TAB_STOP 4
@@ -425,9 +424,10 @@ void editorDelChar() {
     editorRowDelChar(row, E.cx - 1);
     E.cx--;
   } else {
-    E.cx = E.row[E.cy - 1].size;
+    int tmp = E.row[E.cy - 1].size;
     editorRowAppendString(&E.row[E.cy - 1], row->chars, row->size);
     editorDelRow(E.cy);
+    E.cx = tmp;
     E.cy--;
   }
 }
