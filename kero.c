@@ -112,6 +112,13 @@ char *C_HL_keywords[] = {
   "void|", NULL
 };
 
+char *BASH_HL_extensions[] = { ".sh", NULL };
+char *BASH_HL_keywords[] = {
+  "break", "continue", "cd", "continue", "eval", "exec", "exit", "export",
+  "getopts", "hash", "pwd", "readonly", "return", "shift", "test", "times", "trap", "umask", "unset",
+  NULL
+};
+
 struct editorSyntax HLDB[] = {
   {
     "c",
@@ -120,6 +127,13 @@ struct editorSyntax HLDB[] = {
     "//", "/*", "*/",
     HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
   },
+  {
+    "bash",
+    BASH_HL_extensions,
+    BASH_HL_keywords,
+    "#", "/*", "*/",
+    HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
+  }
 };																	
 #define HLDB_ENTRIES (sizeof(HLDB) / sizeof(HLDB[0]))
 
@@ -1097,6 +1111,7 @@ void editorProcessKeypressNormalMode() {
     E.mode = MODE_INSERT;
     break;
   case ':':
+  case '\'':
   case ';':
     editorColon();
     break;
