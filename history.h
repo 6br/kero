@@ -1,8 +1,6 @@
 #ifndef UNDO_H
 #define UNDO_H
 
-#include "kilo.h"
-
 typedef struct history {
   editorConfig *buffer[5];
   int size;
