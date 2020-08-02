@@ -121,9 +121,15 @@ char *BASH_HL_keywords[] = {
 
 char *PYTHON_HL_extensions[] = { ".py", NULL };
 char *PYTHON_HL_keywords[] = {
-  "and", "as", "assert", "break", "class", "continue", "def", "del", "elif", "else", "except", "exec",
+  "and", "as", "assert", "break", "class", "continue", "def", "del", "elif", "else", "else:" "except", "exec",
   "finally", "for", "global", "if", "in", "is", "lambda", "not", "or", "pass", "raise", "return",
-  "try" "while" "with","yield", NULL
+  "try" "while" "with", "yield", "import", "from", NULL
+};
+
+
+char *JS_HL_extensions[] = { ".js", ".jsx", ".ts", ".tsx", ".json",  NULL};
+char *JS_HL_keywords[] = {
+  "break","case", "catch", "class", "const", "continue", "debugger", "default", "delete", "do", "else", "export", "extends", "finally", "for", "from", "function", "if", "import", "in", "instanceof", "new", "return", "super", "switch", "this", "throw", "try", "typeof", "var", "void", "while", "with", "yield", NULL
 };
 
 struct editorSyntax HLDB[] = {
@@ -146,6 +152,13 @@ struct editorSyntax HLDB[] = {
     PYTHON_HL_extensions,
     PYTHON_HL_keywords,
     "#", "\"\"\"", "\"\"\"",
+    HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
+  },
+  {
+    "javascript",
+    JS_HL_extensions,
+    JS_HL_keywords,
+    "//", "/*", "*/",
     HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
   }
 };																	
