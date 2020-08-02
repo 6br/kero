@@ -1080,6 +1080,7 @@ void processKeyNormalMode_d() {
   int c = editorReadKey();
   switch (c) {
   case 'd':
+    editorCopyRow(E.cy);
     editorDelRow(E.cy);
     message("");
     break;
@@ -1096,7 +1097,6 @@ void processKeyNormalMode_y() {
   switch (c) {
   case 'y':
     editorCopyRow(E.cy);
-    //message(E.yank);
     message("");
     break;
   default:
