@@ -794,18 +794,18 @@ void editorColon() {
   char* query = editorPrompt(":%s", NULL);
   if (query) {
     long int v = strtol(query, &end, 10);
-    if (strcmp(query, "q!") == 0) {
+    if (strcmp(query, "q!") == 0 || strcmp(query, "Q!") == 0) {
       editorQuit();
-    } else if (strcmp(query, "wq") == 0) {
+    } else if (strcmp(query, "wq") == 0 || strcmp(query, "WQ") == 0) {
       editorSave();
       editorQuit();
-    } else if (strcmp(query,"q") == 0) {
+    } else if (strcmp(query,"q") == 0 || strcmp(query,"Q") == 0) {
       if (E.dirty == 0) {
         editorQuit();
       } else {
         message("No write since last change.");
       }
-    } else if (strcmp(query, "w") == 0) {
+    } else if (strcmp(query, "W") == 0 || strcmp(query, "w") == 0) {
       editorSave();
     } else if (errno != ERANGE && end != query) {
       if (E.numrows <= v) v = E.numrows - 1;
