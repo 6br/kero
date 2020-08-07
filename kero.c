@@ -330,10 +330,10 @@ void editorUpdateRow(erow *row) {
 
 void editorPasteRow() {
   if (E.yank != NULL) {
+    E.cy++;
     editorInsertRow(E.cy, E.yank, E.yanksize,1);
     erow *row = &E.row[E.cy];
     editorUpdateRow(row);
-    E.cy++;
     E.cx = E.rownumber;
   }
 }
@@ -478,14 +478,53 @@ char *editorRowsToString(int *buflen) {
   return buf;
 }
 
+size_t split(char* s, const char* separator, char** result, size_t result_size)
+{
+    //assert(s != NULL);
+    //assert(separator != NULL);
+    //assert(result != NULL);
+    //assert(result_size > 0);
+
+    size_t i = 0;
+
+    char* p = strtok(s, separator);
+    while (p != NULL && result_size >= i) {
+        //assert(i < result_size);
+        result[i] = p;
+        ++i;
+
+        p = strtok(NULL, separator);
+    }
+
+    return i;
+}
+
 void editorOpen(char *filename) {
   free(E.filename);
-  E.filename = strdup(filename);
-
-  editorSelectSyntaxHighlight();
+  int cx = 0;
+  int cy = 0;
 
   FILE *fp = fopen(filename, "r");
-  if (!fp) die("fopen");
+  if (!fp) {
+    char* result1[4];
+    size_t split_num = split(filename, ":", result1, sizeof(result1)/sizeof(result1[0]));
+    if (split_num == 2 || split_num == 3) {
+      fp = fopen(result1[0], "r");
+      if (fp) {
+        E.filename = strdup(result1[0]);
+        cy = atoi(result1[1]);
+        if (split_num == 3) 
+          cx = atoi(result1[2]);
+      } else {
+        die("fopen");
+      }
+    } else {
+      die("fopen");
+    }
+  } else {
+    E.filename = strdup(filename);
+  }
+  editorSelectSyntaxHighlight();
   char *line = NULL;
   size_t linecap = 0;
   ssize_t linelen;
@@ -498,6 +537,8 @@ void editorOpen(char *filename) {
   free(line);
   fclose(fp);
   E.dirty = 0;
+  E.cy = cy;
+  E.cx = cx;
 }
 
 void editorQuit() {
