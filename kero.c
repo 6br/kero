@@ -106,7 +106,7 @@ struct editorConfig history_redo(struct editorConfig *e);
 /*** filetypes ***/
 char *C_HL_extensions[] = { ".c", ".h", ".cpp", NULL };
 char *C_HL_keywords[] = {
-  "switch", "if", "while", "for", "break", "continue", "return", "else",
+  "switch", "if", "while", "for", "break", "continue", "default", "return", "else",
   "struct", "union", "typedef", "static", "enum", "class", "case","#define", "#include",
   "int|", "long|", "double|", "float|", "char|", "unsigned|", "signed|", "bool|",
   "void|", NULL
@@ -1115,14 +1115,15 @@ void editorMoveCursor(int key) {
 }
 
 // TODO: fix cursor behaviour
-void processKeyNormalMode_d() {
-  message("d...");
+void processKeyNormalMode_d(int num) {
+  message("%dd...", num);
   editorRefreshScreen(); // display the message
   int c = editorReadKey();
   switch (c) {
   case 'd':
     editorCopyRow(E.cy);
-    editorDelRow(E.cy);
+    for (int i=0;i<num;i++)
+      editorDelRow(E.cy);
     message("");
     break;
   default:
@@ -1131,14 +1132,41 @@ void processKeyNormalMode_d() {
 }
 
 // TODO: fix cursor behaviour
-void processKeyNormalMode_y() {
-  message("y...");
+void processKeyNormalMode_y(int num) {
+  message("%dy...", num);
   editorRefreshScreen(); // display the message
   int c = editorReadKey();
   switch (c) {
   case 'y':
     editorCopyRow(E.cy);
     message("");
+    break;
+  default:
+    message("%c is undefined", c);
+  }
+}
+// TODO: fix cursor behaviour
+void processKeyNormalMode_n(int num) {
+  message("%d...", num);
+  editorRefreshScreen(); // display the message
+  int c = editorReadKey();
+  switch (c) {
+  case 'd':
+    processKeyNormalMode_d(num);
+    break;
+  case 'y':
+    processKeyNormalMode_y(num);
+    break;
+  case '1':
+  case '2':
+  case '3':
+  case '4':
+  case '5':
+  case '6':
+  case '7':
+  case '8':
+  case '9':
+    processKeyNormalMode_n(c - '0' + num * 10);
     break;
   default:
     message("%c is undefined", c);
@@ -1149,11 +1177,22 @@ void editorProcessKeypressNormalMode() {
   char buf[100];
   int c = editorReadKey();
   switch (c) {
+  case '1':
+  case '2':
+  case '3': 
+  case '4': 
+  case '5': 
+  case '6': 
+  case '7': 
+  case '8': 
+  case '9':
+    processKeyNormalMode_n(c - '0');
+    break; 
   case 'd':
-    processKeyNormalMode_d();
+    processKeyNormalMode_d(1);
     break;
   case 'y':
-    processKeyNormalMode_y();
+    processKeyNormalMode_y(1);
     break;
   case 'p':
     editorPasteRow();
