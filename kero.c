@@ -94,6 +94,8 @@ struct editorConfig {
   int rownumber;
   char *yank;
   int yanksize;
+  char *find;
+  int findsize;
   struct editorConfig *undo;
   struct editorConfig *redo;
 };
@@ -167,7 +169,7 @@ struct editorSyntax HLDB[] = {
 /*** prototypes ***/
 void editorSetStatusMessage(const char *fmt, ...);
 void editorRefreshScreen();
-char *editorPrompt(char *prompt, void (*callback)(char *, int));
+char *editorPrompt(char *prompt, void (*callback)(char *, int), char *buf);
 void editorUpdateSyntax(erow *row);
 void editorSelectSyntaxHighlight();
 void message(const char *fmt, ...);
@@ -548,8 +550,9 @@ void editorQuit() {
 }
 
 void editorSave() {
+  E = history_push(&E);
   if (E.filename == NULL) {
-    E.filename = editorPrompt("Save as: %s (ESC to cancel)", NULL);
+    E.filename = editorPrompt("Save as: %s (ESC to cancel)", NULL, NULL);
     if (E.filename == NULL) {
       editorSetStatusMessage("Save aborted");
       return;
@@ -637,9 +640,13 @@ void editorFind() {
   int saved_rowoff = E.rowoff;
 
   char *query = editorPrompt("Search: %s (Use ESC/Arrows/Enter)",
-                             editorFindCallback);
+                             editorFindCallback, E.find);
   if (query) {
-    free(query);
+    if (E.find) {
+      free(E.find);
+    }
+    E.find = query;
+    // free(query);
   } else {
     E.cx = saved_cx;
     E.cy = saved_cy;
@@ -832,7 +839,7 @@ void abFree(struct abuf *ab) {
 void editorColon() {
   errno = 0;
   char* end;
-  char* query = editorPrompt(":%s", NULL);
+  char* query = editorPrompt(":%s", NULL, NULL);
   if (query) {
     long int v = strtol(query, &end, 10);
     if (strcmp(query, "q!") == 0 || strcmp(query, "Q!") == 0) {
@@ -1039,7 +1046,7 @@ void message(const char *fmt, ...) {
   va_end(ap);
   E.statusmsg_time = time(NULL);
 }
-char *editorPrompt(char *prompt, void (*callback)(char *, int)) {
+char *editorPrompt(char *prompt, void (*callback)(char *, int), char *prev) {
   size_t bufsize = 128;
   char *buf = malloc(bufsize);
   size_t buflen = 0;
@@ -1060,6 +1067,8 @@ char *editorPrompt(char *prompt, void (*callback)(char *, int)) {
         editorSetStatusMessage("");
         if (callback) callback(buf, c);
         return buf;
+      } else {
+        memcpy(buf, prev, bufsize); // It makes bug
       }
     } else if (!iscntrl(c) && c < 128) {
       if (buflen == bufsize - 1) {
@@ -1070,7 +1079,7 @@ char *editorPrompt(char *prompt, void (*callback)(char *, int)) {
       buf[buflen] = '\0';
     }
 
-      if (callback) callback(buf, c);
+    if (callback) callback(buf, c);
   }
 }
 
@@ -1288,10 +1297,12 @@ void editorProcessKeypressNormalMode() {
     E.cx = E.row[E.cy].size;
     break;
   case 'u': {
+    //struct editorConfig E3 = 
+    history_push(&E);
+    //struct editorConfig E4 = history_undo(&E3);
     struct editorConfig E2 = history_undo(&E);
     memcpy(&E, &E2, sizeof(E2));
     E.mode = MODE_NORMAL;
-    //E = history_push(&E);
     for (int i=0;i<E.numrows;i++)
       editorUpdateRow(&E.row[i]);
   } break;
