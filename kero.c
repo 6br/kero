@@ -1068,7 +1068,10 @@ char *editorPrompt(char *prompt, void (*callback)(char *, int), char *prev) {
         if (callback) callback(buf, c);
         return buf;
       } else {
-        memcpy(buf, prev, bufsize); // It makes bug
+        if (prev) {
+          memcpy(buf, prev, bufsize); // It makes bug
+          buflen = strlen(buf);
+        }
       }
     } else if (!iscntrl(c) && c < 128) {
       if (buflen == bufsize - 1) {
