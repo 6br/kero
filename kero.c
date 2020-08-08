@@ -646,6 +646,7 @@ void editorFind() {
       free(E.find);
     }
     E.find = query;
+    E.findsize = strlen(query);
     // free(query);
   } else {
     E.cx = saved_cx;
