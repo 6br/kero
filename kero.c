@@ -4,6 +4,7 @@
 #define _BSD_SOURCE
 #define _GNU_SOURCE
 
+#include <assert.h>
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -514,7 +515,7 @@ void editorOpen(char *filename) {
       fp = fopen(result1[0], "r");
       if (fp) {
         E.filename = strdup(result1[0]);
-        cy = atoi(result1[1]);
+        cy = atoi(result1[1]) - 1;
         if (split_num == 3) 
           cx = atoi(result1[2]);
       } else {
@@ -1170,6 +1171,7 @@ void processKeyNormalMode_n(int num) {
   case 'y':
     processKeyNormalMode_y(num);
     break;
+  case '0':
   case '1':
   case '2':
   case '3':
